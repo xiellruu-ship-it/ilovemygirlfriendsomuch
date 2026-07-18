@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title> Digital Gift </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #ffdde1 0%, #ee9ca7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', 'Poppins', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+            padding: 16px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .screen {
+            background: rgba(255, 248, 245, 0.98);
+            border-radius: 48px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 215, 215, 0.5);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ========= PASSCODE SCREEN ========= */
+        .passcode-wrapper {
+            padding: 32px 24px 40px;
+            text-align: center;
+        }
+
+        .passcode-header {
+            margin-bottom: 24px;
+        }
+
+        .passcode-header .emoji-icon {
+            font-size: 3.5rem;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .passcode-header h2 {
+            font-size: 1.6rem;
+            color: #c44569;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .code-display {
+            background: #fef0f3;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #ffb7c5;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .code-digits {
+            font-size: 2rem;
+            letter-spacing: 12px;
+            font-weight: 700;
+            color: #c44569;
+            font-family: monospace;
+            background: transparent;
+            border: none;
+            text-align: center;
+            width: 100%;
+            outline: none;
+        }
+
+        .error-box {
+            background: #ffe0e7;
+            border-radius: 50px;
+            padding: 10px 16px;
+            margin: 12px auto;
+            width: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            animation: shakeAnim 0.4s ease;
+        }
+
+        .error-box span {
+            color: #c2185b;
+            font-weight: 500;
+        }
+
+        .gif-emote {
+            font-size: 1.6rem;
+            animation: bounce 0.5s infinite;
+        }
+
+        @keyframes shakeAnim {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .hidden-element {
+            display: none;
+        }
+
+        .keypad {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .keypad-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .key {
+            background: white;
+            width: 75px;
+            height: 75px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: #c44569;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid #ffccd5;
+            user-select: none;
+        }
+
+        .key:active {
+            transform: scale(0.94);
+            background: #ffe4ec;
+        }
+
+        .key.special {
+            background: #ffb7c5;
+            color: white;
+        }
+
+        .key.del {
+            background: #ffe0e7;
+            color: #c44569;
+        }
+
+        @media (max-width: 480px) {
+            .key { width: 65px; height: 65px; font-size: 1.8rem; }
+            .code-digits { font-size: 1.6rem; letter-spacing: 8px; }
+            .keypad-row { gap: 15px; }
+        }
+
+        /* ========= MAIN DASHBOARD - VERTICAL LAYOUT ========= */
+        .dashboard {
+            background: #fffaf5;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .simple-header {
+            padding: 32px 20px 16px;
+            text-align: center;
+        }
+
+        .simple-header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c44569, #e88ba3);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .simple-header .sub-message {
+            color: #b5838a;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* VERTICAL BUTTONS STACK */
+        .vertical-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            padding: 20px 28px 24px;
+            flex: 1;
+        }
+
+        .nav-btn-vertical {
+            background: white;
+            border: none;
+            width: 100%;
+            padding: 20px 18px;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(196, 69, 105, 0.12);
+            border: 1px solid #ffe2ea;
+        }
+
+        .nav-btn-vertical:active {
+            transform: scale(0.98);
+            background: #fff5f8;
+        }
+
+        .nav-icon-large {
+            font-size: 2.8rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .nav-text-group {
+            text-align: left;
+            flex: 1;
+        }
+
+        .nav-label-large {
+            font-weight: 700;
+            color: #c44569;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
+        }
+
+        .nav-role-large {
+            font-size: 0.75rem;
+            color: #b5838a;
+            margin-top: 4px;
+        }
+
+        .nav-arrow {
+            font-size: 1.5rem;
+            color: #ffb7c5;
+        }
+
+        /* ========= PAGE CONTAINER (SEPARATE PAGES) ========= */
+        .page-container {
+            background: #fffaf5;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 16px 8px;
+            gap: 12px;
+            border-bottom: 2px solid #ffe0e7;
+            margin-bottom: 8px;
+        }
+
+        .back-button {
+            background: #fce4ec;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            font-size: 1.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: #c44569;
+        }
+
+        .back-button:active {
+            background: #ffccd5;
+            transform: scale(0.94);
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #c44569;
+            flex: 1;
+        }
+
+        .page-content {
+            padding: 8px 20px 32px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 65vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ========= DIRECT LOVE LETTER STYLES (NO ENVELOPE) ========= */
+        .direct-letter {
+            background: linear-gradient(145deg, #fffef7 0%, #fff9f0 100%);
+            border-radius: 48px;
+            box-shadow: 0 20px 35px rgba(196, 69, 105, 0.2), 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 28px 24px;
+            margin: 20px 0 30px;
+            border: 1px solid #ffe2ea;
+            position: relative;
+            transition: all 0.3s ease;
+            animation: fadeSlideUp 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .direct-letter::before {
+            content: "❤️";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            background: #fffaf5;
+            padding: 0 12px;
+            border-radius: 50px;
+            color: #c44569;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .letter-content {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #4a2c38;
+        }
+
+        .letter-content h4 {
+            color: #c44569;
+            margin-bottom: 18px;
+            font-size: 1.3rem;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        .letter-content p {
+            margin-bottom: 14px;
+        }
+
+        .letter-content .signature {
+            margin-top: 20px;
+            text-align: right;
+            font-style: italic;
+            color: #c44569;
+            font-weight: 500;
+            border-top: 1px dashed #ffccd5;
+            padding-top: 16px;
+        }
+
+        .letter-footer-emoji {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            letter-spacing: 6px;
+        }
+
+        .romantic-note {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #b5838a;
+            background: #fff0f3;
+            display: inline-block;
+            width: auto;
+            margin: 10px auto 0;
+            padding: 8px 20px;
+            border-radius: 40px;
+        }
+
+        @media (max-width: 480px) {
+            .direct-letter {
+                padding: 22px 18px;
+                margin: 15px 0 25px;
+            }
+            .letter-content {
+                font-size: 0.85rem;
+                line-height: 1.6;
+            }
+            .letter-content h4 {
+                font-size: 1.2rem;
+            }
+            .page-content {
+                padding: 8px 16px 24px;
+            }
+        }
+
+        /* ========= SPOTIFY MUSIC PAGE ========= */
+        .music-section h3 {
+            color: #c44569;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .add-song-btn {
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-bottom: 18px;
+            box-shadow: 0 6px 14px rgba(29, 185, 84, 0.25);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-song-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 3px 8px rgba(29, 185, 84, 0.2);
+        }
+
+        .song-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .song-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid #ffe0e7;
+            transition: all 0.2s ease;
+            animation: fadeSlideUp 0.4s ease;
+        }
+
+        .song-card:active {
+            transform: scale(0.99);
+        }
+
+        .song-info-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .song-emoji {
+            font-size: 2rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .song-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .song-title {
+            font-weight: bold;
+            color: #c44569;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-artist {
+            font-size: 0.75rem;
+            color: #a56b7c;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .play-btn {
+            background: #1DB954;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            border: none;
+            font-family: inherit;
+        }
+
+        .play-btn:active {
+            background: #169c45;
+            transform: scale(0.95);
+        }
+
+        .play-btn.playing {
+            background: #c44569;
+        }
+
+        .delete-song-btn {
+            background: #ffe0e7;
+            color: #c2185b;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .delete-song-btn:active {
+            background: #ffcdd2;
+            transform: scale(0.9);
+        }
+
+        .spotify-embed-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .spotify-embed-container.active {
+            display: block;
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        .spotify-embed-container iframe {
+            width: 100%;
+            height: 152px;
+            border: none;
+            border-radius: 16px;
+        }
+
+        .music-empty-note {
+            text-align: center;
+            color: #b5838a;
+            font-size: 0.85rem;
+            padding: 40px 16px;
+            background: #fff0f3;
+            border-radius: 24px;
+            border: 2px dashed #ffccd5;
+        }
+
+        /* Add Song Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 32px;
+            padding: 28px 24px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-box h3 {
+            color: #c44569;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+
+        .modal-box .modal-sub {
+            text-align: center;
+            color: #b5838a;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ffccd5;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: #4a2c38;
+            margin-bottom: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .modal-input:focus {
+            border-color: #c44569;
+        }
+
+        .modal-input::placeholder {
+            color: #d4a5b0;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 20px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background: #f5f5f5;
+            color: #888;
+        }
+
+        .modal-btn.cancel:active {
+            background: #e0e0e0;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #1DB954, #1ed760);
+            color: white;
+        }
+
+        .modal-btn.confirm:active {
+            transform: scale(0.97);
+        }
+
+        .modal-error {
+            color: #c2185b;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .modal-error.show {
+            display: block;
+            animation: shakeAnim 0.4s ease;
+        }
+
+        /* Gallery Page */
+        .gallery-section h3 {
+            color: #c44569;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 14px;
+        }
+
+        .gallery-card {
+            background: #fff0f3;
+            border-radius: 24px;
+            overflow: hidden;
+            aspect-ratio: 1 / 1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .gallery-card:active {
+            transform: scale(0.97);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(196, 69, 105, 0.85);
+            color: white;
+            font-size: 0.65rem;
+            padding: 6px;
+            text-align: center;
+            transform: translateY(100%);
+            transition: 0.2s;
+        }
+
+        .gallery-card:hover .gallery-caption {
+            transform: translateY(0);
+        }
+
+        /* Gallery Add/Delete Controls */
+        .add-photo-btn {
+            background: linear-gradient(135deg, #c44569, #e88ba3);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-bottom: 18px;
+            box-shadow: 0 6px 14px rgba(196, 69, 105, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .add-photo-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 3px 8px rgba(196, 69, 105, 0.2);
+        }
+
+        .delete-photo-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(194, 24, 91, 0.9);
+            color: white;
+            border: 2px solid white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.15s ease;
+        }
+
+        .delete-photo-btn:active {
+            transform: scale(0.88);
+            background: #c2185b;
+        }
+
+        .gallery-empty-note {
+            text-align: center;
+            color: #b5838a;
+            font-size: 0.85rem;
+            padding: 40px 16px;
+            background: #fff0f3;
+            border-radius: 24px;
+            border: 2px dashed #ffccd5;
+        }
+
+        .simple-footer {
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 16px 20px 24px;
+            color: #cb7a9a;
+            border-top: 1px solid #ffe0e7;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <!-- PASSCODE SCREEN -->
+    <div id="passcodeScreen" class="screen">
+        <div class="passcode-wrapper">
+            <div class="passcode-header">
+                <div class="emoji-icon">💌🔐</div>
+                <h2>Unlock your special gift</h2>
+                <p style="font-size:0.75rem; margin-top:4px;">Enter 4-digit code ❤️</p>
+            </div>
+            <div class="code-display">
+                <input type="text" id="codeInput" class="code-digits" readonly placeholder="____" maxlength="4" value="">
+            </div>
+            <div id="errorContainer" class="hidden-element">
+                <div class="error-box">
+                    <span>❌ Wrong passcode! Try again.</span>
+                    <div class="gif-emote">😭💔😫</div>
+                </div>
+            </div>
+            <div class="keypad">
+                <div class="keypad-row">
+                    <div class="key" data-digit="1">1</div>
+                    <div class="key" data-digit="2">2</div>
+                    <div class="key" data-digit="3">3</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key" data-digit="4">4</div>
+                    <div class="key" data-digit="5">5</div>
+                    <div class="key" data-digit="6">6</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key" data-digit="7">7</div>
+                    <div class="key" data-digit="8">8</div>
+                    <div class="key" data-digit="9">9</div>
+                </div>
+                <div class="keypad-row">
+                    <div class="key special del" data-action="delete">⌫</div>
+                    <div class="key" data-digit="0">0</div>
+                    <div class="key special" style="visibility: hidden;">✓</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD (Vertical navigation) -->
+    <div id="mainDashboard" class="screen hidden">
+        <div class="dashboard">
+            <div class="simple-header">
+                <h1>Happy Anniversary!</h1>
+                <p class="sub-message">Just enjoy the occasion 🎉</p>
+            </div>
+            <div class="vertical-nav">
+                <button class="nav-btn-vertical" data-section="message">
+                    <div class="nav-icon-large">💌</div>
+                    <div class="nav-text-group">
+                        <div class="nav-label-large">Message</div>
+                        <div class="nav-role-large">Love Letter</div>
+                    </div>
+                    <div class="nav-arrow">→</div>
+                </button>
+                <button class="nav-btn-vertical" data-section="music">
+                    <div class="nav-icon-large">🎵</div>
+                    <div class="nav-text-group">
+                        <div class="nav-label-large">Favorite Music</div>
+                        <div class="nav-role-large">Our Melody</div>
+                    </div>
+                    <div class="nav-arrow">→</div>
+                </button>
+                <button class="nav-btn-vertical" data-section="gallery">
+                    <div class="nav-icon-large">📸</div>
+                    <div class="nav-text-group">
+                        <div class="nav-label-large">Gallery</div>
+                        <div class="nav-role-large">Precious Memories</div>
+                    </div>
+                    <div class="nav-arrow">→</div>
+                </button>
+            </div>
+            <div class="simple-footer">
+                Forever yours, with all my heart ❤️
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGE PAGE -->
+    <div id="messagePage" class="screen hidden">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="back-button" data-back="message">←</button>
+                <div class="page-title">💌 Love Letter</div>
+                <div style="width: 44px;"></div>
+            </div>
+            <div class="page-content">
+                <div class="direct-letter">
+                    <div class="letter-content">
+                        <h4>💖 My Dearest Love 💖</h4>
+                        <p>Happy Anniversary, my love! 🌹 From the moment our paths crossed, my world became infinitely brighter and more beautiful. You are not just my partner, but my greatest blessing, my safe harbor, and my endless inspiration.</p>
+                        <p>Every laugh we share, every gentle hug, every quiet moment with you feels like a precious gift wrapped in gold. Your smile lights up my darkest days, and your love gives me strength I never knew I had.</p>
+                        <p>With you, I've discovered what it truly means to be seen, to be cherished, and to love unconditionally. I promise to stand by your side through every season, to support your dreams, and to fill your life with the same joy you bring to mine — today, tomorrow, and for all the years ahead.</p>
+                        <p>Thank you for being unapologetically you. You make my heart whole, and I fall deeper in love with you more with each passing sunrise. ❤️</p>
+                        <div class="signature">
+                            <strong>Yours always and forever,<br>Your Soulmate 💕</strong>
+                        </div>
+                        <div class="letter-footer-emoji">
+                            💖🌹💖
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: center;">
+                    <div class="romantic-note">
+                        ✨ Forever begins with us ✨
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MUSIC PAGE - SPOTIFY EMBED -->
+    <div id="musicPage" class="screen hidden">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="back-button" data-back="music">←</button>
+                <div class="page-title">🎵 Our Melody</div>
+                <div style="width: 44px;"></div>
+            </div>
+            <div class="page-content" id="musicPageContent"></div>
+        </div>
+    </div>
+
+    <!-- GALLERY PAGE -->
+    <div id="galleryPage" class="screen hidden">
+        <div class="page-container">
+            <div class="page-header">
+                <button class="back-button" data-back="gallery">←</button>
+                <div class="page-title">📸 Precious Memories</div>
+                <div style="width: 44px;"></div>
+            </div>
+            <div class="page-content" id="galleryPageContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD SONG MODAL -->
+<div id="addSongModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>🎵 Add a Song</h3>
+        <p class="modal-sub">Paste a Spotify track link or URI</p>
+        <input type="text" id="songUrlInput" class="modal-input" placeholder="https://open.spotify.com/track/...">
+        <input type="text" id="songTitleInput" class="modal-input" placeholder="Song Title (optional)">
+        <input type="text" id="songArtistInput" class="modal-input" placeholder="Artist (optional)">
+        <div id="modalError" class="modal-error">❌ Invalid Spotify link. Please check and try again.</div>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" id="cancelAddSong">Cancel</button>
+            <button class="modal-btn confirm" id="confirmAddSong">Add Song 💚</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // PASSCODE LOGIC
+    const CORRECT_CODE = "0412";
+    let currentCode = "";
+    const codeInputField = document.getElementById("codeInput");
+    const errorContainer = document.getElementById("errorContainer");
+    const passcodeScreen = document.getElementById("passcodeScreen");
+    const mainDashboard = document.getElementById("mainDashboard");
+    let isProcessing = false;
+
+    const messagePage = document.getElementById("messagePage");
+    const musicPage = document.getElementById("musicPage");
+    const galleryPage = document.getElementById("galleryPage");
+
+    function updateCodeDisplay() {
+        let displayValue = currentCode.padEnd(4, " ").slice(0, 4);
+        codeInputField.value = displayValue;
+    }
+
+    function showWrongError() {
+        if (isProcessing) return;
+        isProcessing = true;
+        errorContainer.classList.remove("hidden-element");
+        const displayDiv = document.querySelector(".code-display");
+        displayDiv.style.animation = "shakeAnim 0.4s ease";
+        setTimeout(() => { displayDiv.style.animation = ""; }, 400);
+        setTimeout(() => {
+            errorContainer.classList.add("hidden-element");
+            isProcessing = false;
+        }, 1800);
+        currentCode = "";
+        updateCodeDisplay();
+    }
+
+    function autoSubmitIfComplete() {
+        if (currentCode.length === 4 && !isProcessing) {
+            if (currentCode === CORRECT_CODE) {
+                passcodeScreen.classList.add("hidden");
+                mainDashboard.classList.remove("hidden");
+                errorContainer.classList.add("hidden-element");
+                isProcessing = false;
+                currentCode = "";
+                messagePage.classList.add("hidden");
+                musicPage.classList.add("hidden");
+                galleryPage.classList.add("hidden");
+            } else {
+                showWrongError();
+            }
+        }
+    }
+
+    function addDigit(digit) {
+        if (currentCode.length < 4 && !isProcessing) {
+            currentCode += digit;
+            updateCodeDisplay();
+            autoSubmitIfComplete();
+        }
+    }
+
+    function deleteDigit() {
+        if (!isProcessing && currentCode.length > 0) {
+            currentCode = currentCode.slice(0, -1);
+            updateCodeDisplay();
+            errorContainer.classList.add("hidden-element");
+        }
+    }
+
+    // ========== SPOTIFY MUSIC SYSTEM ==========
+    const MUSIC_STORAGE_KEY = "anniversarySpotifyPlaylist";
+    let currentlyPlayingId = null;
+
+    // Default playlist with real Spotify tracks
+    const DEFAULT_PLAYLIST = [
+        { 
+            id: "spotify:track:0tgVpDi06FyKpA1zm0rEO5", 
+            title: "Perfect", 
+            artist: "Ed Sheeran",
+            emoji: "🎸"
+        },
+        { 
+            id: "spotify:track:44AyOl4qVkzS48vBsbNXaC", 
+            title: "Can't Help Falling in Love", 
+            artist: "Elvis Presley",
+            emoji: "🎤"
+        },
+        { 
+            id: "spotify:track:3U4isOIWM3VvDubwSI3y7a", 
+            title: "All of Me", 
+            artist: "John Legend",
+            emoji: "🎹"
+        }
+    ];
+
+    function loadPlaylist() {
+        try {
+            const saved = localStorage.getItem(MUSIC_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {
+            console.log("Could not load playlist");
+        }
+        return [...DEFAULT_PLAYLIST];
+    }
+
+    function savePlaylist() {
+        try {
+            localStorage.setItem(MUSIC_STORAGE_KEY, JSON.stringify(playlist));
+        } catch (e) {
+            alert("⚠️ Could not save playlist.");
+        }
+    }
+
+    let playlist = loadPlaylist();
+
+    // Extract Spotify track ID from various URL formats
+    function extractSpotifyId(input) {
+        if (!input || typeof input !== 'string') return null;
+        input = input.trim();
+        
+        // Already a URI: spotify:track:XXXX
+        const uriMatch = input.match(/^spotify:track:([a-zA-Z0-9]{22})$/);
+        if (uriMatch) return `spotify:track:${uriMatch[1]}`;
+        
+        // Full URL: https://open.spotify.com/track/XXXX?...
+        const urlMatch = input.match(/open\.spotify\.com\/track\/([a-zA-Z0-9]{22})/);
+        if (urlMatch) return `spotify:track:${urlMatch[1]}`;
+        
+        // Just the ID: 22 characters
+        const idMatch = input.match(/^([a-zA-Z0-9]{22})$/);
+        if (idMatch) return `spotify:track:${idMatch[1]}`;
+        
+        return null;
+    }
+
+    // Get embed URL from track ID
+    function getEmbedUrl(trackId) {
+        // Convert spotify:track:XXXX to just XXXX for embed
+        const id = trackId.replace('spotify:track:', '');
+        return `https://open.spotify.com/embed/track/${id}?utm_source=generator&theme=0`;
+    }
+
+    function openAddSongModal() {
+        document.getElementById('songUrlInput').value = '';
+        document.getElementById('songTitleInput').value = '';
+        document.getElementById('songArtistInput').value = '';
+        document.getElementById('modalError').classList.remove('show');
+        document.getElementById('addSongModal').classList.add('active');
+        setTimeout(() => document.getElementById('songUrlInput').focus(), 100);
+    }
+
+    function closeAddSongModal() {
+        document.getElementById('addSongModal').classList.remove('active');
+    }
+
+    function addSong() {
+        const urlInput = document.getElementById('songUrlInput').value.trim();
+        const titleInput = document.getElementById('songTitleInput').value.trim();
+        const artistInput = document.getElementById('songArtistInput').value.trim();
+        const errorEl = document.getElementById('modalError');
+        
+        const trackId = extractSpotifyId(urlInput);
+        
+        if (!trackId) {
+            errorEl.classList.add('show');
+            return;
+        }
+        
+        // Check for duplicates
+        if (playlist.some(song => song.id === trackId)) {
+            errorEl.textContent = "❌ This song is already in your playlist!";
+            errorEl.classList.add('show');
+            return;
+        }
+        
+        const newSong = {
+            id: trackId,
+            title: titleInput || "Unknown Song",
+            artist: artistInput || "Unknown Artist",
+            emoji: "🎵"
+        };
+        
+        playlist.push(newSong);
+        savePlaylist();
+        closeAddSongModal();
+        currentlyPlayingId = null; // Reset player
+        renderMusicPageContent();
+    }
+
+    function deleteSong(index) {
+        const song = playlist[index];
+        if (!song) return;
+        if (confirm(`Remove "${song.title}" from your playlist? 💔`)) {
+            if (currentlyPlayingId === song.id) {
+                currentlyPlayingId = null;
+            }
+            playlist.splice(index, 1);
+            savePlaylist();
+            renderMusicPageContent();
+        }
+    }
+
+    function playSong(trackId) {
+        // If clicking the same song, toggle off
+        if (currentlyPlayingId === trackId) {
+            currentlyPlayingId = null;
+        } else {
+            currentlyPlayingId = trackId;
+        }
+        renderMusicPageContent();
+    }
+
+    function renderMusicPageContent() {
+        const container = document.getElementById("musicPageContent");
+        if (!container) return;
+        
+        let musicHtml = `
+            <div class="music-section">
+                <h3>🎶 Our Favorite Melodies 🎶</h3>
+                <button class="add-song-btn" id="addSongBtn">
+                    <span>➕</span> Add a Spotify Song
+                </button>`;
+        
+        if (playlist.length === 0) {
+            musicHtml += `
+                <div class="music-empty-note">
+                    No songs yet... tap "Add a Spotify Song" to build your playlist 💕<br><br>
+                    <small>Tip: Copy any track link from the Spotify app or web player!</small>
+                </div>`;
+        } else {
+            musicHtml += `<div class="song-list">`;
+            playlist.forEach((song, idx) => {
+                const isPlaying = currentlyPlayingId === song.id;
+                musicHtml += `
+                <div class="song-card">
+                    <div class="song-info-row">
+                        <div class="song-emoji">${song.emoji}</div>
+                        <div class="song-details">
+                            <div class="song-title">${escapeHtml(song.title)} ${isPlaying ? ' ▶️' : ''}</div>
+                            <div class="song-artist">${escapeHtml(song.artist)}</div>
+                        </div>
+                        <div class="song-actions">
+                            <button class="play-btn ${isPlaying ? 'playing' : ''}" data-play="${song.id}">
+                                ${isPlaying ? '⏸ Hide' : '▶️ Play'}
+                            </button>
+                            <button class="delete-song-btn" data-delete="${idx}" title="Remove song">🗑</button>
+                        </div>
+                    </div>
+                    ${isPlaying ? `
+                    <div class="spotify-embed-container active">
+                        <iframe src="${getEmbedUrl(song.id)}" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy">
+                        </iframe>
+                    </div>` : ''}
+                </div>`;
+            });
+            musicHtml += `</div>`;
+        }
+        
+        musicHtml += `<p style="font-size:0.7rem; text-align:center; margin-top:22px; color:#b5838a;">
+            💖 These songs remind me of us 💖<br>
+            <small>Powered by Spotify Embed</small>
+        </p></div>`;
+        
+        container.innerHTML = musicHtml;
+        
+        // Bind events
+        const addBtn = document.getElementById('addSongBtn');
+        if (addBtn) addBtn.addEventListener('click', openAddSongModal);
+        
+        document.querySelectorAll('#musicPageContent .play-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const trackId = btn.getAttribute('data-play');
+                playSong(trackId);
+            });
+        });
+        
+        document.querySelectorAll('#musicPageContent .delete-song-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteSong(parseInt(btn.getAttribute('data-delete')));
+            });
+        });
+    }
+
+    // Modal event listeners
+    document.getElementById('cancelAddSong').addEventListener('click', closeAddSongModal);
+    document.getElementById('confirmAddSong').addEventListener('click', addSong);
+    document.getElementById('songUrlInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addSong();
+    });
+    document.getElementById('addSongModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('addSongModal')) closeAddSongModal();
+    });
+
+    // GALLERY
+    // ============================================
+    // ADD YOUR DEFAULT PHOTOS HERE
+    // Place your images in a "photos/" folder next to index.html
+    // Example: photos/photo1.jpg, photos/photo2.jpg, etc.
+    // ============================================
+    const DEFAULT_GALLERY_IMAGES = [
+       
+    { url: "https://raw.githubusercontent.com/jurielpanganiban/test2/main/photos/photo1.jpg", caption: "Our Moment 1 💕" },
+    { url: "https://raw.githubusercontent.com/jurielpanganiban/test2/main/photos/photo2.jpg", caption: "Our Moment 2 😊" },
+    // etc.
+];
+
+    const GALLERY_STORAGE_KEY = "anniversaryGalleryImages";
+
+    function loadGalleryImages() {
+        try {
+            const saved = localStorage.getItem(GALLERY_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {
+            console.log("Could not load saved photos");
+        }
+        return [...DEFAULT_GALLERY_IMAGES];
+    }
+
+    function saveGalleryImages() {
+        try {
+            localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify(galleryImages));
+        } catch (e) {
+            alert("⚠️ Storage is full — this change will only last until the page closes.");
+        }
+    }
+
+    let galleryImages = loadGalleryImages();
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function addCustomPhoto() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) processAndAddPhoto(file);
+        };
+        input.click();
+    }
+
+    function processAndAddPhoto(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const MAX_SIZE = 800;
+                let w = img.width, h = img.height;
+                if (w >= h && w > MAX_SIZE) { h = Math.round(h * MAX_SIZE / w); w = MAX_SIZE; }
+                else if (h > MAX_SIZE) { w = Math.round(w * MAX_SIZE / h); h = MAX_SIZE; }
+                const canvas = document.createElement("canvas");
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+                const caption = prompt("Add a caption for this photo 💕", "Our Moment ❤️");
+                galleryImages.push({ url: dataUrl, caption: caption || "Our Moment ❤️" });
+                saveGalleryImages();
+                renderGalleryPageContent();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function deletePhoto(index) {
+        const target = galleryImages[index];
+        if (!target) return;
+        if (confirm(`Delete "${target.caption}"? 💔`)) {
+            galleryImages.splice(index, 1);
+            saveGalleryImages();
+            renderGalleryPageContent();
+        }
+    }
+
+    function openLightbox(imgSrc, caption) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '10000';
+        overlay.style.cursor = 'pointer';
+        const imgElem = document.createElement('img');
+        imgElem.src = imgSrc;
+        imgElem.style.maxWidth = '90%';
+        imgElem.style.maxHeight = '80%';
+        imgElem.style.borderRadius = '28px';
+        imgElem.style.boxShadow = '0 0 0 4px #ffb7c5, 0 20px 35px black';
+        const cap = document.createElement('div');
+        cap.innerText = caption;
+        cap.style.color = 'white';
+        cap.style.backgroundColor = '#c44569cc';
+        cap.style.padding = '8px 20px';
+        cap.style.borderRadius = '60px';
+        cap.style.marginTop = '20px';
+        overlay.appendChild(imgElem);
+        overlay.appendChild(cap);
+        overlay.addEventListener('click', () => overlay.remove());
+        document.body.appendChild(overlay);
+    }
+
+    function renderGalleryPageContent() {
+        const container = document.getElementById("galleryPageContent");
+        if (!container) return;
+        let galleryHtml = `
+            <div class="gallery-section">
+                <h3>📸 Our Beautiful Moments</h3>
+                <button class="add-photo-btn" id="addPhotoBtn">➕ Add a Photo</button>`;
+        if (galleryImages.length === 0) {
+            galleryHtml += `<p class="gallery-empty-note">No photos found in the <code>photos/</code> folder.<br>Make sure your images are in the correct folder and filenames match.<br><br>💕 You can also tap "Add a Photo" to upload your own! 💕</p>`;
+        } else {
+            galleryHtml += `<div class="gallery-grid">`;
+            galleryImages.forEach((img, i) => {
+                galleryHtml += `
+                <div class="gallery-card" data-index="${i}">
+                    <button class="delete-photo-btn" data-delete="${i}" title="Delete photo">✕</button>
+                    <img src="${img.url}" alt="moment ${i}" loading="lazy">
+                    <div class="gallery-caption">${escapeHtml(img.caption)}</div>
+                </div>`;
+            });
+            galleryHtml += `</div><p style="text-align:center; margin-top:20px; font-size:0.75rem;">✨ Tap any photo to see it bigger ✨</p>`;
+        }
+        galleryHtml += `</div>`;
+        container.innerHTML = galleryHtml;
+
+        document.getElementById("addPhotoBtn").addEventListener("click", addCustomPhoto);
+
+        document.querySelectorAll('#galleryPageContent .gallery-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const idx = parseInt(card.getAttribute('data-index'));
+                const img = galleryImages[idx];
+                if (img) openLightbox(img.url, img.caption);
+            });
+        });
+
+        document.querySelectorAll('#galleryPageContent .delete-photo-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deletePhoto(parseInt(btn.getAttribute('data-delete')));
+            });
+        });
+    }
+
+    function showPage(pageId) {
+        mainDashboard.classList.add("hidden");
+        messagePage.classList.add("hidden");
+        musicPage.classList.add("hidden");
+        galleryPage.classList.add("hidden");
+        // Stop any playing music when leaving music page
+        if (pageId !== 'musicPage') {
+            currentlyPlayingId = null;
+        }
+        document.getElementById(pageId).classList.remove("hidden");
+        
+        if (pageId === 'musicPage') renderMusicPageContent();
+        else if (pageId === 'galleryPage') renderGalleryPageContent();
+    }
+
+    function goBackToDashboard() {
+        currentlyPlayingId = null;
+        mainDashboard.classList.remove("hidden");
+        messagePage.classList.add("hidden");
+        musicPage.classList.add("hidden");
+        galleryPage.classList.add("hidden");
+    }
+
+    document.querySelectorAll('.nav-btn-vertical').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const section = btn.getAttribute('data-section');
+            if (section === 'message') showPage('messagePage');
+            else if (section === 'music') showPage('musicPage');
+            else if (section === 'gallery') showPage('galleryPage');
+        });
+    });
+
+    document.querySelectorAll('.back-button').forEach(btn => {
+        btn.addEventListener('click', () => goBackToDashboard());
+    });
+
+    document.querySelectorAll('.key[data-digit]').forEach(key => {
+        key.addEventListener('click', () => {
+            const digit = key.getAttribute('data-digit');
+            if (digit) addDigit(digit);
+        });
+    });
+    const delBtn = document.querySelector('[data-action="delete"]');
+    if (delBtn) delBtn.addEventListener('click', () => deleteDigit());
+    
+    document.addEventListener('keydown', (e) => {
+        if (!passcodeScreen.classList.contains('hidden')) {
+            if (e.key >= '0' && e.key <= '9') { addDigit(e.key); e.preventDefault(); }
+            else if (e.key === 'Backspace') { deleteDigit(); e.preventDefault(); }
+        }
+    });
+
+    function init() {
+        currentCode = "";
+        isProcessing = false;
+        updateCodeDisplay();
+        errorContainer.classList.add("hidden-element");
+        passcodeScreen.classList.remove("hidden");
+        mainDashboard.classList.add("hidden");
+        messagePage.classList.add("hidden");
+        musicPage.classList.add("hidden");
+        galleryPage.classList.add("hidden");
+        currentlyPlayingId = null;
+    }
+    init();
+</script>
+</body>
+</html>
